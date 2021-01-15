@@ -70,7 +70,7 @@ module.exports = {
   async get(req, res) {
     try {
       const user = await User.findOne({ _id: req.params.id })
-        .populate({ path: "todos" })
+        .populate({ path: "_todos" })
         .select("-password -forgotpassword")
         .exec()
       return res.json({ error: false, user })

@@ -36,10 +36,10 @@ const UserSchema = new mongoose.Schema({
     },
   },
 
-  _todos: [{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "Todo",
-  }],
+  // _todos: [{
+  //   type: mongoose.Schema.Types.ObjectId,
+  //   ref: "Todo",
+  // }],
 
   forgotpassword: {
     requestedAt: { type: Date, default: null },
@@ -117,11 +117,23 @@ UserSchema.virtual("name.full").set(function (v) {
   this.name.last = v.substr(v.indexOf(" ") + 1)
 })
 
-// UserSchema.virtual('booksPublished', {
-//   ref: 'Book', //The Model to use
-//   localField: '_id', //Find in Model, where localField
-//   foreignField: 'publisher', // is equal to foreignField
-// });
+/**
+ * @action Defined Schema Virtual
+ * @keys
+ *    1.   The first parameter can be named anything.
+ *          It defines the name of the key to be named on the Schema
+ *
+ *    2. Options Object
+ *       ref: Model name for Child collection
+ *       localField: Key for reference id, stored on Child Doc, as named on Parent Doc.
+ *       foreignField: Key name that holds localField value on Child Document
+ */
+
+UserSchema.virtual("_todos", {
+  ref: "Todo", // The Model to use
+  localField: "_id", // Find in Model, where localField
+  foreignField: "_user", // is equal to foreignField
+})
 
 UserSchema.set("toJSON", { virtuals: true })
 UserSchema.set("toObject", { virtuals: true })

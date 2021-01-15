@@ -1,5 +1,6 @@
 const Todo = require("../../models/todo")
 const User = require("../../models/user")
+const mail = require("../../lib/mails")
 
 module.exports = {
   async find(req, res) {
@@ -34,9 +35,26 @@ module.exports = {
         _user: req.user._id,
       })
       const newTodo = await todo.save()
-      const user = await User.findOne({ _id: req.user._id }).populate("_user", "-password -forgotpassword").exec()
-      user._todos.push(newTodo)
-      await user.save()
+      //   const user = await User.findOne({ _id: req.user._id }).populate("_user", "-password -forgotpassword").exec()
+      //   user._todos.push(newTodo)
+      //   await user.save()
+
+      try {
+        await mail("todo-notification", {
+          to: "",
+          subjectt: "Todo Notification",
+          locals: {
+            userName: req.user.fullName,
+            email: req.user.email,
+            url: `1 Todo is added .`
+          }
+        })
+      } catch (mailErr) {
+        console.log("==> Mail sending Error: ", mailErr)
+        throw new Error(
+          "Failed to send Password Reset Email! Please Retry Later."
+        )
+      }
 
       return res.json({
         error: false,
@@ -84,9 +102,9 @@ module.exports = {
   async delete(req, res) {
     try {
       await Todo.deleteOne({ _id: req.params.id }).exec()
-      const user = await User.findOne({ _id: req.user._id }).populate("_user", "-password -forgotpassword").exec()
-      user._todos.pop(req.params._id)
-      await user.save()
+      //   const user = await User.findOne({ _id: req.user._id }).populate("_user", "-password -forgotpassword").exec()
+      //   user._todos.pop(req.params._id)
+      //   await user.save()
       return res.json({
         error: false,
         message: "Todo deleted",
