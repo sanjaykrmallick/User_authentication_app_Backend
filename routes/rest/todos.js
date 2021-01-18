@@ -46,7 +46,7 @@ module.exports = {
           locals: {
             userName: req.user.fullName,
             email: req.user.email,
-            url: `1 Todo is added .`
+            task: `1 Todo is added .`
           }
         })
       } catch (mailErr) {
@@ -88,6 +88,23 @@ module.exports = {
 
       let updatedData = await updateTodo.save()
       updatedData = updatedData.toObject()
+      try {
+        await mail("todo-notification", {
+          to: "",
+          subjectt: "Todo Notification",
+          locals: {
+            userName: req.user.fullName,
+            email: req.user.email,
+            task: `1 Todo is updated .`
+          }
+        })
+      } catch (mailErr) {
+        console.log("==> Mail sending Error: ", mailErr)
+        throw new Error(
+          "Failed to send Password Reset Email! Please Retry Later."
+        )
+      }
+
       return res.json({
         error: false,
         message: "Todo updated",
@@ -105,6 +122,23 @@ module.exports = {
       //   const user = await User.findOne({ _id: req.user._id }).populate("_user", "-password -forgotpassword").exec()
       //   user._todos.pop(req.params._id)
       //   await user.save()
+      try {
+        await mail("todo-notification", {
+          to: "",
+          subjectt: "Todo Notification",
+          locals: {
+            userName: req.user.fullName,
+            email: req.user.email,
+            task: `1 Todo is deleted .`
+          }
+        })
+      } catch (mailErr) {
+        console.log("==> Mail sending Error: ", mailErr)
+        throw new Error(
+          "Failed to send Password Reset Email! Please Retry Later."
+        )
+      }
+
       return res.json({
         error: false,
         message: "Todo deleted",
